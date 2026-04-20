@@ -40,6 +40,7 @@ export function DataTable({
   const selectAllRef = React.useRef<HTMLInputElement>(null);
   const allSelected = data.length > 0 && data.every((r) => selectedRecords.has(r.id));
   const someSelected = data.some((r) => selectedRecords.has(r.id)) && !allSelected;
+  const [editingCell, setEditingCell] = React.useState<{ id: string; field: "comments" } | null>(null);
 
   React.useEffect(() => {
     const el = selectAllRef.current;
@@ -191,12 +192,18 @@ export function DataTable({
                   </td>
                 )}
                 {columnVisibility.comments && (
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <input
-                      type="text"
+                  <td className="px-4 py-3">
+                    <textarea
                       value={r.comments}
                       onChange={(e) => onUpdateRecord(r.id, { comments: e.target.value })}
-                      className="w-full min-w-[200px] px-3 py-1.5 border border-[#4a4a4a] rounded-sm text-xs text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-[#2d2d2d] hover:border-[#5a5a5a] transition-colors"
+                      onFocus={() => setEditingCell({ id: r.id, field: "comments" })}
+                      onBlur={() => setEditingCell(null)}
+                      rows={editingCell?.id === r.id && editingCell?.field === "comments" ? 4 : 1}
+                      className={`w-full min-w-[200px] px-3 py-1.5 border border-[#4a4a4a] rounded-sm text-xs text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-[#2d2d2d] hover:border-[#5a5a5a] transition-all resize-none ${
+                        editingCell?.id === r.id && editingCell?.field === "comments"
+                          ? "whitespace-normal"
+                          : "whitespace-nowrap overflow-hidden"
+                      }`}
                     />
                   </td>
                 )}
